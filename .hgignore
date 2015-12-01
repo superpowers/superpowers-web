@@ -1,0 +1,8 @@
+syntax: glob
+node_modules/
+player/**.js
+public/plugins.json
+public/templates.json
+plugins/sparklinlabs/*/*/**.js
+plugins/sparklinlabs/*/public/**.css
+plugins/sparklinlabs/*/public/**.html

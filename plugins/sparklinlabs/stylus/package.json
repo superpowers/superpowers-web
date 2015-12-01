@@ -1,0 +1,11 @@
+{
+  "name": "superpowers-web-sparklinlabs-jade-plugin",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Elisée MAURER <elisee@sparklinlabs.com>",
+  "license": "ISC",
+  "dependencies": {
+    "operational-transform": "^0.2.3",
+    "stylus": "^0.52.4"
+  }
+}
