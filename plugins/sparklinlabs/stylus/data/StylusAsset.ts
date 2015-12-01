@@ -104,9 +104,7 @@ export default class StylusAsset extends SupCore.Data.Base.Asset {
 
       let oldReadFileSync = fs.readFileSync;
       (fs as any).readFileSync = (...args) => {
-        console.log(args);
         if (args[0].indexOf(".styl") === -1 || args[0].indexOf("/stylus/lib/") !== -1) { return oldReadFileSync.apply(null, args); }
-        console.log("meh");
         return stylusFiles[args[0].replace(/\\/g, "/")];
       };
       let css = stylus(this.pub.text).set("filename", `${pathFromId}.styl`).set("cache", false).render();
