@@ -93,12 +93,15 @@ export default class StylusAsset extends SupCore.Data.Base.Asset {
 
     async.each(stylusEntries, (stylusEntry, cb) => {
       this.server.data.assets.acquire(stylusEntry.id, null, (err, item: StylusAsset) => {
-        stylusFiles[`${this.server.data.entries.getPathFromId(stylusEntry.id)}.styl`] = item.pub.text;
+        let filename = this.server.data.entries.getPathFromId(stylusEntry.id);
+        if (filename.lastIndexOf(".styl") !== filename.length - 5) filename += ".styl";
+        stylusFiles[filename] = item.pub.text;
         this.server.data.assets.release(stylusEntry.id, null);
         cb();
       });
     }, () => {
       let pathFromId = this.server.data.entries.getPathFromId(this.id);
+      if (pathFromId.lastIndexOf(".styl") === pathFromId.length - 5) pathFromId = pathFromId.slice(0, -5);
       let outputPath = `${buildPath}/assets/${pathFromId}.css`;
       let parentPath = outputPath.slice(0, outputPath.lastIndexOf("/"));
 
