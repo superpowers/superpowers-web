@@ -4,6 +4,9 @@
   "description": "",
   "author": "Elisée MAURER <elisee@sparklinlabs.com>",
   "license": "ISC",
+  "scripts": {
+    "build": "gulp --gulpfile=../../../../../scripts/pluginGulpfile.js --cwd=."
+  },
   "dependencies": {
     "jade": "^1.11.0",
     "operational-transform": "^0.2.3"
