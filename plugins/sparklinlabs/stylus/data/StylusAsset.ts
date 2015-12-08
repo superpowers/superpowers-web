@@ -3,13 +3,14 @@
 import * as OT from "operational-transform";
 import * as mkdirp from "mkdirp";
 import * as async from "async";
+import * as dummy_fs from "fs";
 
 // Since we're doing weird things to the fs module,
 // the code won't browserify properly with brfs
 // so we'll only require them on the server-side
 let serverRequire = require;
 
-let fs: any;
+let fs: typeof dummy_fs;
 let path: any;
 let stylus: any;
 if ((<any>global).window == null) {
@@ -92,7 +93,7 @@ export default class StylusAsset extends SupCore.Data.Base.Asset {
     let stylusFiles: { [filename: string]: string; } = {};
 
     async.each(stylusEntries, (stylusEntry, cb) => {
-      this.server.data.assets.acquire(stylusEntry.id, null, (err, item: StylusAsset) => {
+      this.server.data.assets.acquire(stylusEntry.id, null, (err: Error, item: StylusAsset) => {
         let filename = this.server.data.entries.getPathFromId(stylusEntry.id);
         if (filename.lastIndexOf(".styl") !== filename.length - 5) filename += ".styl";
         stylusFiles[filename] = item.pub.text;
@@ -106,7 +107,7 @@ export default class StylusAsset extends SupCore.Data.Base.Asset {
       let parentPath = outputPath.slice(0, outputPath.lastIndexOf("/"));
 
       let oldReadFileSync = fs.readFileSync;
-      (fs as any).readFileSync = (...args) => {
+      (fs as any).readFileSync = (...args: any[]) => {
         if (args[0].indexOf(".styl") === -1 || args[0].indexOf("/stylus/lib/") !== -1) { return oldReadFileSync.apply(null, args); }
         return stylusFiles[args[0].replace(/\\/g, "/")];
       };

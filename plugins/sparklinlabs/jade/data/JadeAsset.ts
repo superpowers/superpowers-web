@@ -3,13 +3,14 @@
 import * as OT from "operational-transform";
 import * as mkdirp from "mkdirp";
 import * as async from "async";
+import * as dummy_fs from "fs";
 
 // Since we're doing weird things to the fs module,
 // the code won't browserify properly with brfs
 // so we'll only require them on the server-side
 let serverRequire = require;
 
-let fs: any;
+let fs: typeof dummy_fs;
 let path: any;
 let jade: any;
 if ((<any>global).window == null) {
@@ -92,7 +93,7 @@ export default class JadeAsset extends SupCore.Data.Base.Asset {
     let jadeFiles: { [filename: string]: string; } = {};
 
     async.each(jadeEntries, (jadeEntry, cb) => {
-      this.server.data.assets.acquire(jadeEntry.id, null, (err, item: JadeAsset) => {
+      this.server.data.assets.acquire(jadeEntry.id, null, (err: Error, item: JadeAsset) => {
         let filename = this.server.data.entries.getPathFromId(jadeEntry.id);
         if (filename.lastIndexOf(".jade") !== filename.length - 5) filename += ".jade";
         jadeFiles[filename] = item.pub.text;
@@ -106,10 +107,10 @@ export default class JadeAsset extends SupCore.Data.Base.Asset {
       let parentPath = outputPath.slice(0, outputPath.lastIndexOf("/"));
 
       let oldReadFileSync = fs.readFileSync;
-      (fs as any).readFileSync = (...args) => {
+      (fs as any).readFileSync = (...args: any[]) => {
         if (args[0].indexOf(".jade") === -1) return oldReadFileSync.apply(null, args);
         return jadeFiles[args[0].replace(/\\/g, "/")];
-      }
+      };
       let html = jade.render(this.pub.text, { filename: `${pathFromId}.jade` });
       fs.readFileSync = oldReadFileSync;
 
