@@ -6,16 +6,14 @@ let socket: SocketIOClient.Socket;
 let projectClient: SupClient.ProjectClient;
 let editor: TextEditorWidget;
 let asset: StylusAsset;
-let clientId: number;
 
 socket = SupClient.connect(SupClient.query.project);
 socket.on("welcome", onWelcome);
 socket.on("disconnect", SupClient.onDisconnected);
 
-function onWelcome(theClientId: number) {
-  clientId = theClientId;
+function onWelcome(clientId: number) {
   projectClient = new SupClient.ProjectClient(socket);
-  setupEditor();
+  setupEditor(clientId);
 
   let subscriber: SupClient.AssetSubscriber = {
     onAssetReceived, onAssetEdited,
@@ -39,7 +37,7 @@ function onAssetEdited(assetId: string, command: string, ...args: any[]) {
   }
 }
 
-function setupEditor() {
+function setupEditor(clientId: number) {
   let textArea = <HTMLTextAreaElement>document.querySelector(".text-editor");
   editor = new TextEditorWidget(projectClient, clientId, textArea, {
     mode: "text/x-styl",
