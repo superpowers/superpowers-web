@@ -146,7 +146,7 @@ export default class StylusAsset extends SupCore.Data.Base.Asset {
     this.pub.revisionId++;
   }
 
-  server_saveText(client: any, callback: (err: string) => any) {
+  server_applyDraftChanges(client: any, callback: (err: string) => any) {
     this.pub.text = this.pub.draft;
 
     callback(null);
@@ -159,5 +159,5 @@ export default class StylusAsset extends SupCore.Data.Base.Asset {
     this.emit("change");
   }
 
-  client_saveText() { this.pub.text = this.pub.draft; }
+  client_applyDraftChanges() { this.pub.text = this.pub.draft; }
 }

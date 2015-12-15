@@ -22,7 +22,6 @@ class TextEditorWidget {
 
   editCallback: EditCallback;
   sendOperationCallback: SendOperationCallback;
-  saveCallback: Function;
 
   clientId: number;
   tmpCodeMirrorDoc = new CodeMirror.Doc("");
@@ -50,17 +49,12 @@ class TextEditorWidget {
           else cm.execCommand("insertTab");
         }
       },
-      "Cmd-X": () => { document.execCommand("cut"); },
-      "Cmd-C": () => { document.execCommand("copy"); },
-      "Cmd-V": () => { document.execCommand("paste"); },
       "Ctrl-Z": () => { this.undo(); },
       "Cmd-Z": () => { this.undo(); },
       "Shift-Ctrl-Z": () => { this.redo(); },
       "Shift-Cmd-Z": () => { this.redo(); },
       "Ctrl-Y": () => { this.redo(); },
-      "Cmd-Y": () => { this.redo(); },
-      "Ctrl-S": () => { this.saveCallback(); },
-      "Cmd-S": () => { this.saveCallback(); }
+      "Cmd-Y": () => { this.redo(); }
     }
     if (options.extraKeys != null) {
       for (let keyName in options.extraKeys) {
@@ -70,7 +64,6 @@ class TextEditorWidget {
 
     this.editCallback = options.editCallback;
     this.sendOperationCallback = options.sendOperationCallback;
-    this.saveCallback = options.saveCallback;
 
     this.codeMirrorInstance = CodeMirror.fromTextArea(textArea, {
       // theme: "monokai",
@@ -91,8 +84,41 @@ class TextEditorWidget {
     this.codeMirrorInstance.on("changes", <any>this.edit);
     this.codeMirrorInstance.on("beforeChange", this.beforeChange);
 
+    this.setupElectronMenu();
+
     this.clientId = clientId;
     projectClient.subResource("textEditorSettings", this);
+  }
+
+  private setupElectronMenu() {
+    if (window.navigator.userAgent.indexOf("Electron") === -1) return;
+
+    let electron: GitHubElectron.Electron = (top as any).global.require("electron");
+    let win = electron.remote.getCurrentWindow();
+
+    let menu = new electron.remote.Menu();
+    menu.append(new electron.remote.MenuItem({
+      label: SupClient.i18n.t("common:actions.cut"),
+      accelerator: "CmdOrCtrl+X",
+      click: () => { document.execCommand("cut"); }
+    }));
+    menu.append(new electron.remote.MenuItem({
+      label: SupClient.i18n.t("common:actions.copy"),
+      accelerator: "CmdOrCtrl+C",
+      click: () => { document.execCommand("copy"); }
+    }));
+    menu.append(new electron.remote.MenuItem({
+      label: SupClient.i18n.t("common:actions.paste"),
+      accelerator: "CmdOrCtrl+V",
+      click: () => { document.execCommand("paste"); }
+    }));
+
+    this.codeMirrorInstance.getWrapperElement().addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+      let bounds = win.getBounds();
+      menu.popup(win, event.screenX - bounds.x, event.screenY - bounds.y);
+      return false;
+    });
   }
 
   setText(text: string) {

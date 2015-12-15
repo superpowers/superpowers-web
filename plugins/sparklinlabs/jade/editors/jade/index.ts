@@ -32,7 +32,7 @@ function onAssetEdited(assetId: string, command: string, ...args: any[]) {
   if (command === "editText") {
     // errorPaneStatus.classList.add("has-draft");
     editor.receiveEditText(args[0]);
-  } else if (command === "saveText") {
+  } else if (command === "applyDraftChanges") {
     // errorPaneStatus.classList.remove("has-draft");
   }
 }
@@ -41,9 +41,12 @@ function setupEditor(clientId: number) {
   let textArea = <HTMLTextAreaElement>document.querySelector(".text-editor");
   editor = new TextEditorWidget(projectClient, clientId, textArea, {
     mode: "text/x-jade",
+    extraKeys: {
+      "Ctrl-S": () => { applyDraftChanges(); },
+      "Cmd-S": () => { applyDraftChanges(); },
+    },
     editCallback: onEditText,
-    sendOperationCallback: onSendOperation,
-    saveCallback: onSaveText
+    sendOperationCallback: onSendOperation
   });
 }
 
@@ -55,6 +58,6 @@ function onSendOperation(operation: OperationData) {
   });
 }
 
-function onSaveText() {
-  socket.emit("edit:assets", SupClient.query.asset, "saveText", (err: string) => { if (err != null) { alert(err); SupClient.onDisconnected(); }});
+function applyDraftChanges() {
+  socket.emit("edit:assets", SupClient.query.asset, "applyDraftChanges", (err: string) => { if (err != null) { alert(err); SupClient.onDisconnected(); }});
 }
