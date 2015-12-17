@@ -1,0 +1,11 @@
+{
+  "sidebar": {
+    "settings": {
+      "file": "File",
+      "filename": "Filename",
+      "download": {
+        "prompt": "Enter a name for the file."
+      }
+    }
+  }
+}
