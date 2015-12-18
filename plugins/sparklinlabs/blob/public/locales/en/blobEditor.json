@@ -2,6 +2,7 @@
   "sidebar": {
     "settings": {
       "file": "File",
+      "mediaType": "Media type",
       "filename": "Filename",
       "download": {
         "prompt": "Enter a name for the file."

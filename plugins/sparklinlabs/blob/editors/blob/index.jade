@@ -21,6 +21,10 @@ html
               input.file-select(type="file")
             button.download(disabled)= t("common:actions.download")
         tr
+          th= t("blobEditor:sidebar.settings.mediaType")
+          td
+            input.mediaType(type="text",readonly)
+        tr
           th= t("blobEditor:sidebar.settings.filename")
           td
             input.filename(type="text",readonly)

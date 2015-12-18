@@ -37,11 +37,11 @@ function onWelcome() {
   projectClient.subAsset(SupClient.query.asset, "blob", subscriber);
 
   let entriesSubscriber: SupClient.EntriesSubscriber = {
-    onEntriesReceived: () => { setupOutputFilename(); },
+    onEntriesReceived: () => { setupMediaInfo(); },
     onEntryAdded: () => { /* Ignore */ },
     onEntryMoved: () => { /* Ignore */ },
     onEntryTrashed: () => { /* Ignore */ },
-    onSetEntryProperty: (id: string, key: string) => { if (id === SupClient.query.asset && key === "name") setupOutputFilename(); }
+    onSetEntryProperty: (id: string, key: string) => { if (id === SupClient.query.asset && key === "name") setupMediaInfo(); }
   };
   projectClient.subEntries(entriesSubscriber);
 }
@@ -52,7 +52,7 @@ function onAssetReceived(assetId: string, theAsset: BlobAsset) {
   (document.querySelector("button.upload") as HTMLButtonElement).disabled = false;
   (document.querySelector("button.download") as HTMLButtonElement).disabled = false;
   setupPreview();
-  setupOutputFilename();
+  setupMediaInfo();
 }
 
 let previewObjectURL: string;
@@ -97,8 +97,10 @@ function setupPreview() {
   }
 }
 
-function setupOutputFilename() {
+function setupMediaInfo() {
   if (projectClient.entries == null || asset == null) return;
+
+  (document.querySelector("input.mediaType") as HTMLInputElement).value = asset.pub.mediaType;
 
   let entry = projectClient.entries.byId[SupClient.query.asset];
   outputFilename = entry.name;
@@ -116,7 +118,7 @@ function setupOutputFilename() {
 function onAssetEdited(assetId: string, command: string, ...args: any[]) {
   if (command === "upload") {
     setupPreview();
-    setupOutputFilename();
+    setupMediaInfo();
   }
 }
 
