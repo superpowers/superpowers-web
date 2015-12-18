@@ -9,16 +9,17 @@ html
 
   body
     .main
+      .no-preview= t("common:states.loading")
 
     .sidebar
       table.properties
         tr
           th= t("blobEditor:sidebar.settings.file")
           td
-            button.upload= t("common:actions.upload")
+            button.upload(disabled)= t("common:actions.upload")
             form(style="display: none")
               input.file-select(type="file")
-            button.download= t("common:actions.download")
+            button.download(disabled)= t("common:actions.download")
         tr
           th= t("blobEditor:sidebar.settings.filename")
           td

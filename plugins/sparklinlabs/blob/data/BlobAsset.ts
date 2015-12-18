@@ -8,13 +8,23 @@ interface BlobAssetPub {
 }
 
 export const defaultExtensions: { [mediaType: string]: string; } = {
-  "image/png": "png",
-  "image/jpeg": "jpg",
   "image/gif": "gif",
+  "image/jpeg": "jpg",
+  "image/png": "png",
   "image/svg+xml": "svg",
+
+  "audio/mp3": "mp3",
+  "audio/ogg": "ogg",
+  "audio/opus": "opus",
+  "audio/wav": "wav",
+
+  "video/mp4": "mp4",
+  "video/ogg": "ogv",
+
   "application/font-woff": "woff",
-  "application/zip": "zip",
   "application/json": "json",
+  "application/zip": "zip",
+
   "application/octet-stream": "dat"
 };
 

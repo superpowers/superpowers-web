@@ -38,9 +38,9 @@ function onWelcome() {
 
   let entriesSubscriber: SupClient.EntriesSubscriber = {
     onEntriesReceived: () => { setupOutputFilename(); },
-    onEntryAdded: () => {},
-    onEntryMoved: () => {},
-    onEntryTrashed: () => {},
+    onEntryAdded: () => { /* Ignore */ },
+    onEntryMoved: () => { /* Ignore */ },
+    onEntryTrashed: () => { /* Ignore */ },
     onSetEntryProperty: (id: string, key: string) => { if (id === SupClient.query.asset && key === "name") setupOutputFilename(); }
   };
   projectClient.subEntries(entriesSubscriber);
@@ -49,6 +49,8 @@ function onWelcome() {
 function onAssetReceived(assetId: string, theAsset: BlobAsset) {
   asset = theAsset;
 
+  (document.querySelector("button.upload") as HTMLButtonElement).disabled = false;
+  (document.querySelector("button.download") as HTMLButtonElement).disabled = false;
   setupPreview();
   setupOutputFilename();
 }
@@ -75,8 +77,11 @@ function setupPreview() {
     case "audio":
       let playerElt: HTMLImageElement|HTMLVideoElement|HTMLAudioElement;
       if (previewType === "image") playerElt = new Image();
-      else if (previewType === "video") playerElt = document.createElement("video");
-      else if (previewType === "audio") playerElt = document.createElement("audio");
+      else {
+        playerElt = document.createElement(previewType) as HTMLAudioElement|HTMLVideoElement;
+        (playerElt as HTMLAudioElement|HTMLVideoElement).controls = true;
+      }
+
       playerElt.src = previewObjectURL;
       mainElt.appendChild(playerElt);
       break;
