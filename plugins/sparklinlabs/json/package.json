@@ -1,0 +1,12 @@
+{
+  "name": "superpowers-web-sparklinlabs-json-plugin",
+  "description": "JSON plugin for Superpowers Web, the collaborative static site editor",
+  "version": "1.0.0",
+  "license": "ISC",
+  "scripts": {
+    "build": "gulp --gulpfile=../../../../../scripts/pluginGulpfile.js --cwd=."
+  },
+  "dependencies": {
+    "operational-transform": "^0.2.3"
+  }
+}
