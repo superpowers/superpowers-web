@@ -1,7 +1,8 @@
 **/node_modules
+player/**/*.js
 public/index.js
 public/plugins.json
 public/templates.json
-plugins/sparklinlabs/**/*.js
-plugins/sparklinlabs/**/*.css
-plugins/sparklinlabs/**/*.html
+plugins/**/*.html
+plugins/**/*.css
+plugins/**/*.js
