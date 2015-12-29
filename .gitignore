@@ -1,4 +1,3 @@
-syntax: glob
 node_modules/
 player/**.js
 public/plugins.json
