@@ -4,6 +4,7 @@ import * as OT from "operational-transform";
 import * as mkdirp from "mkdirp";
 import * as async from "async";
 import * as dummy_fs from "fs";
+import * as dummy_path from "path";
 
 // Since we're doing weird things to the fs module,
 // the code won't browserify properly with brfs
@@ -11,7 +12,7 @@ import * as dummy_fs from "fs";
 let serverRequire = require;
 
 let fs: typeof dummy_fs;
-let path: any;
+let path: typeof dummy_path;
 let jade: any;
 if ((<any>global).window == null) {
   fs = serverRequire("fs");
