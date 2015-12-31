@@ -1,10 +1,12 @@
 /// <reference path="../../textEditorWidget/operational-transform.d.ts" />
+/// <reference path="../stylus.d.ts" />
 
 import * as OT from "operational-transform";
 import * as mkdirp from "mkdirp";
 import * as async from "async";
 import * as dummy_fs from "fs";
 import * as dummy_path from "path";
+import * as dummy_stylus from "stylus";
 
 // Since we're doing weird things to the fs module,
 // the code won't browserify properly with brfs
@@ -13,7 +15,8 @@ let serverRequire = require;
 
 let fs: typeof dummy_fs;
 let path: typeof dummy_path;
-let stylus: any;
+let stylus: typeof dummy_stylus;
+
 if ((<any>global).window == null) {
   fs = serverRequire("fs");
   path = serverRequire("path");
