@@ -1,4 +1,5 @@
 /// <reference path="../../textEditorWidget/operational-transform.d.ts" />
+/// <reference path="../api/JadeAPIPlugin.d.ts" />
 
 import * as OT from "operational-transform";
 import * as mkdirp from "mkdirp";
@@ -25,6 +26,10 @@ interface JadeAssetPub {
   draft: string;
   revisionId: number;
 }
+
+// NOTE: The active system changes as plugins are loaded
+// That's why we keep a reference to our containing system here
+let system = SupCore.system;
 
 export default class JadeAsset extends SupCore.Data.Base.Asset {
   static schema: SupCore.Data.Base.Schema = {
@@ -112,7 +117,23 @@ export default class JadeAsset extends SupCore.Data.Base.Asset {
         if (args[0].indexOf(".jade") === -1) return oldReadFileSync.apply(null, args);
         return jadeFiles[args[0].replace(/\\/g, "/")];
       };
-      let html = jade.render(this.pub.text, { filename: `${pathFromId}.jade` });
+
+      let options: { [key: string]: any; } = {};
+
+      let plugins = system.api.getPlugins<SupCore.JadeAPIPlugin>("jade");
+      for (let pluginName in plugins) {
+        let pluginLocals = plugins[pluginName].locals;
+        for (let localName in pluginLocals) options[localName] = pluginLocals[localName];
+      }
+
+      options["filename"] = `${pathFromId}.jade`;
+
+      let html = "";
+      try {
+        html = jade.render(this.pub.text, options);
+      } catch (err) {
+        console.log(err);
+      }
       fs.readFileSync = oldReadFileSync;
 
       mkdirp(parentPath, () => { fs.writeFile(outputPath, html, callback); });
