@@ -112,6 +112,8 @@ export default class JadeAsset extends SupCore.Data.Base.Asset {
       let outputPath = `${buildPath}/assets/${pathFromId}.html`;
       let parentPath = outputPath.slice(0, outputPath.lastIndexOf("/"));
 
+      // NOTE: It might be possible to replace this hack once Jade (well, Pug) 2 is out
+      // see https://github.com/pugjs/pug-loader and https://github.com/pugjs/jade/issues/1933
       let oldReadFileSync = fs.readFileSync;
       (fs as any).readFileSync = (...args: any[]) => {
         if (args[0].indexOf(".jade") === -1) return oldReadFileSync.apply(null, args);
