@@ -123,9 +123,11 @@ export default class JadeAsset extends SupCore.Data.Base.Asset {
       let options: { [key: string]: any; } = {};
 
       let plugins = system.getPlugins<SupCore.JadeAPIPlugin>("jadeAPI");
-      for (let pluginName in plugins) {
-        let pluginLocals = plugins[pluginName].locals;
-        for (let localName in pluginLocals) options[localName] = pluginLocals[localName];
+      if (plugins != null) {
+        for (let pluginName in plugins) {
+          let pluginLocals = plugins[pluginName].locals;
+          for (let localName in pluginLocals) options[localName] = pluginLocals[localName];
+        }
       }
 
       options["filename"] = `${pathFromId}.jade`;
