@@ -1,4 +1,4 @@
 [submodule "plugins/common"]
 	path = plugins/common
-	url = https://github.com/superpowers/superpowers-common-plugins.get
+	url = https://github.com/superpowers/superpowers-common-plugins.git
 	branch = master
