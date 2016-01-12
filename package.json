@@ -1,0 +1,14 @@
+{
+  "name": "web",
+  "description": "Web system for Superpowers",
+  "version": "1.0.0",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/superpowers/superpowers-web.git"
+  },
+  "superpowers": {
+    "systemId": "web",
+    "publishedPluginBundles": []
+  }
+}
