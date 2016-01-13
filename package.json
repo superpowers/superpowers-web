@@ -1,6 +1,6 @@
 {
-  "name": "web",
-  "description": "Web system for Superpowers",
+  "name": "superpowers-web",
+  "description": "Static website system for Superpowers, the HTML5 app for real-time collaborative projects",
   "version": "1.0.0",
   "license": "ISC",
   "repository": {
