@@ -24,7 +24,7 @@ interface JSONAssetPub {
 }
 
 export default class JSONAsset extends SupCore.Data.Base.Asset {
-  static schema: SupCore.Data.Base.Schema = {
+  static schema: SupCore.Data.Schema = {
     text: { type: "string" },
     draft: { type: "string" },
     revisionId: { type: "integer" }
