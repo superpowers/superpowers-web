@@ -1,8 +1,7 @@
 {
-  "name": "superpowers-web-sparklinlabs-stylus-plugin",
+  "name": "superpowers-web-default-stylus-plugin",
+  "description": "Stylus plugin for Superpowers Web, the collaborative static site editor",
   "version": "1.0.0",
-  "description": "",
-  "author": "Elisée MAURER <elisee@sparklinlabs.com>",
   "license": "ISC",
   "scripts": {
     "build": "gulp --gulpfile=../../../../../scripts/pluginGulpfile.js --cwd=."
