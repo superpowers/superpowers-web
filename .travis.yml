@@ -13,6 +13,7 @@ before_script:
     - cd ..
     - git clone https://github.com/superpowers/superpowers.git
     - cd superpowers
+    - mkdir systems
     - mv ../superpowers-web systems/web
     - cd systems
     - ls -l 
