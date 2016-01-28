@@ -1,5 +1,7 @@
 # Superpowers Web
 
+[![Build Status](https://travis-ci.org/superpowers/superpowers-web.svg?branch=master)](https://travis-ci.org/superpowers/superpowers-web)
+
 Make static websites in live collaboration with [Superpowers](http://superpowers-html5.com/).
 
 The Superpowers Web system uses [Jade](http://jade-lang.com/) for HTML and [Stylus](http://stylus-lang.com/) for stylesheets.
