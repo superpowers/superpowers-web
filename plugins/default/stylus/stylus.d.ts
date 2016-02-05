@@ -5,6 +5,7 @@
 
 /// <reference path="../../../../../typings/node/node.d.ts" />
 
+/* tslint:disable */
 declare module Stylus {
 
     export interface Static {
