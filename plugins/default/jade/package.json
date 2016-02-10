@@ -3,6 +3,10 @@
   "description": "Jade plugin for Superpowers Web, the collaborative static site editor",
   "version": "1.0.0",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/superpowers/superpowers-web.git"
+  },
   "scripts": {
     "build": "gulp --gulpfile=../../../../../scripts/pluginGulpfile.js --cwd=."
   },
