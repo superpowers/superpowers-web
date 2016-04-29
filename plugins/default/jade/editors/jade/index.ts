@@ -1,7 +1,5 @@
 import JadeAsset from "../../data/JadeAsset";
 
-SupClient.setupHotkeys();
-
 let socket: SocketIOClient.Socket;
 let projectClient: SupClient.ProjectClient;
 let editor: TextEditorWidget;

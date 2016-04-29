@@ -1,7 +1,5 @@
 import JSONAsset from "../../data/JSONAsset";
 
-SupClient.setupHotkeys();
-
 let socket: SocketIOClient.Socket;
 let projectClient: SupClient.ProjectClient;
 let editor: TextEditorWidget;
