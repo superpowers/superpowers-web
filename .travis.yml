@@ -9,8 +9,7 @@ before_script:
 - cd superpowers-core
 - mkdir systems
 - mv ../superpowers-web systems/web
-- cd systems
-- ls -l
+- ls -l systems
 cache:
   directories:
   - node_modules
@@ -23,3 +22,15 @@ notifications:
     on_success: change
     on_failure: always
     on_start: never
+before_deploy:
+- npm run package web
+deploy:
+  provider: releases
+  api_key:
+    secure: h1kBqPeQOjaJ3zBGAF1/xMtLc0Z9XMkJzsoQhfKSHFTwmu+Lr9X08nL2md5Ke8I5LP1RC4g3tyCkNQV8CGv4q3/I5mEw8domr3NZNRR+K2fLQb0JMb+FKRO0Ms3gRhkmVDJEZzqu/NPPIQUBLagnX6uj8tHJcDEcYjJXT6wPzBLag7INY/mQi+8xvYT8CIv3Zl8eNtIplnH3PGdd6p13PlcyQg3lCe+ygo36jMI5wwR1CR9w4JA0VeZJQ6wS3THxJgg/6NhP46ZZ/Dn4V1VIEiBjoJKhQ8l+WVTshDzgAW4IvFbSHM97VxAdOt4r3D19fK4RU0S/OAwq3Dea5YvZ5HjJRyiYjak5SgKj/OQnFJCWl/wEoKjsNctshAN3crUM9100ThzpTyUytBTvV1Y08zW4IlogTvHaPSyg1xfT7uFcynAAi0T/+FVme5+6lNyBloKvKynZnuUGkOc7KFDpJIPg3xasUNLpxua5gZQHvgPQ+1AOC9A4OPxjEkNXP6GI7g1MkomeAPeFa9tHkMj8IjSEfSrIcEHB/SVzAB57kDTVdIydQanqpVgCeiW13c94DO1LGFUEiIkd4VI4YguUn04daIroglc0TrkttPmvnXkZraapq8XSH7P4cllM4SSvXWBeLSQmdclDuuBkKfWiIUQRNhFURlcJkzxAL+0lemo=
+  file_glob: true
+  file: "packages/superpowers-web-*.zip"
+  skip_cleanup: true
+  on:
+    repo: superpowers/superpowers-web
+    tags: true
