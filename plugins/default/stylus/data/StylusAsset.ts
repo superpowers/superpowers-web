@@ -70,6 +70,10 @@ export default class StylusAsset extends SupCore.Data.Base.Asset {
     fs.readFile(path.join(assetPath, "sheet.styl"), { encoding: "utf8" }, (err, text) => {
       fs.readFile(path.join(assetPath, "draft.styl"), { encoding: "utf8" }, (err, draft) => {
         pub = { revisionId: 0, text, draft: (draft != null) ? draft : text };
+
+        pub.draft = pub.draft.replace(/\r\n/g, "\n");
+        pub.text = pub.text.replace(/\r\n/g, "\n");
+
         this._onLoaded(assetPath, pub);
       });
     });
