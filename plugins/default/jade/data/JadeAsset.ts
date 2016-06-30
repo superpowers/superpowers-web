@@ -3,7 +3,6 @@
 
 import * as OT from "operational-transform";
 import * as mkdirp from "mkdirp";
-import * as async from "async";
 import * as dummy_fs from "fs";
 import * as dummy_path from "path";
 
@@ -93,58 +92,50 @@ export default class JadeAsset extends SupCore.Data.Base.Asset {
     });
   }
 
-  publish(buildPath: string, callback: (err: Error) => any) {
-    let jadeEntries: SupCore.Data.EntryNode[] = [];
-    this.server.data.entries.walk((node) => {
-      if (node.type === "jade") jadeEntries.push(node);
-    });
+  serverExport(buildPath: string, assetsById: { [id: string]: JadeAsset }, callback: (err: Error) => void) {
+    let pathFromId = this.server.data.entries.getPathFromId(this.id);
+    if (pathFromId.lastIndexOf(".jade") === pathFromId.length - 5) pathFromId = pathFromId.slice(0, -5);
+    let outputPath = `${buildPath}/assets/${pathFromId}.html`;
+    let parentPath = outputPath.slice(0, outputPath.lastIndexOf("/"));
 
-    let jadeFiles: { [filename: string]: string; } = {};
+    const jadeFiles: { [filename: string]: string; } = {};
+    for (const assetId in assetsById) {
+      if (this.server.data.entries.byId[assetId].type !== "jade") continue;
 
-    async.each(jadeEntries, (jadeEntry, cb) => {
-      this.server.data.assets.acquire(jadeEntry.id, null, (err: Error, item: JadeAsset) => {
-        let filename = this.server.data.entries.getPathFromId(jadeEntry.id);
-        if (filename.lastIndexOf(".jade") !== filename.length - 5) filename += ".jade";
-        jadeFiles[filename] = item.pub.text;
-        this.server.data.assets.release(jadeEntry.id, null);
-        cb();
-      });
-    }, () => {
-      let pathFromId = this.server.data.entries.getPathFromId(this.id);
-      if (pathFromId.lastIndexOf(".jade") === pathFromId.length - 5) pathFromId = pathFromId.slice(0, -5);
-      let outputPath = `${buildPath}/assets/${pathFromId}.html`;
-      let parentPath = outputPath.slice(0, outputPath.lastIndexOf("/"));
+      let filename = this.server.data.entries.getPathFromId(assetId);
+      if (filename.lastIndexOf(".jade") !== filename.length - 5) filename += ".jade";
+      jadeFiles[filename] = assetsById[assetId].pub.text;
+    }
 
-      // NOTE: It might be possible to replace this hack once Jade (well, Pug) 2 is out
-      // see https://github.com/pugjs/pug-loader and https://github.com/pugjs/jade/issues/1933
-      let oldReadFileSync = fs.readFileSync;
-      (fs as any).readFileSync = (...args: any[]) => {
-        if (args[0].indexOf(".jade") === -1) return oldReadFileSync.apply(null, args);
-        return jadeFiles[args[0].replace(/\\/g, "/")];
-      };
+    // NOTE: It might be possible to replace this hack once Jade (well, Pug) 2 is out
+    // see https://github.com/pugjs/pug-loader and https://github.com/pugjs/jade/issues/1933
+    let oldReadFileSync = fs.readFileSync;
+    (fs as any).readFileSync = (...args: any[]) => {
+      if (args[0].indexOf(".jade") === -1) return oldReadFileSync.apply(null, args);
+      return jadeFiles[args[0].replace(/\\/g, "/")];
+    };
 
-      let options: { [key: string]: any; } = {};
+    let options: { [key: string]: any; } = {};
 
-      let plugins = system.getPlugins<SupCore.JadeAPIPlugin>("jadeAPI");
-      if (plugins != null) {
-        for (let pluginName in plugins) {
-          let pluginLocals = plugins[pluginName].locals;
-          for (let localName in pluginLocals) options[localName] = pluginLocals[localName];
-        }
+    let plugins = system.getPlugins<SupCore.JadeAPIPlugin>("jadeAPI");
+    if (plugins != null) {
+      for (let pluginName in plugins) {
+        let pluginLocals = plugins[pluginName].locals;
+        for (let localName in pluginLocals) options[localName] = pluginLocals[localName];
       }
+    }
 
-      options["filename"] = `${pathFromId}.jade`;
+    options["filename"] = `${pathFromId}.jade`;
 
-      let html = "";
-      try {
-        html = jade.render(this.pub.text, options);
-      } catch (err) {
-        console.log(err);
-      }
-      fs.readFileSync = oldReadFileSync;
+    let html = "";
+    try {
+      html = jade.render(this.pub.text, options);
+    } catch (err) {
+      console.log(err);
+    }
+    fs.readFileSync = oldReadFileSync;
 
-      mkdirp(parentPath, () => { fs.writeFile(outputPath, html, callback); });
-    });
+    mkdirp(parentPath, () => { fs.writeFile(outputPath, html, callback); });
   }
 
   server_editText(client: any, operationData: OperationData, revisionIndex: number, callback: EditTextCallback) {

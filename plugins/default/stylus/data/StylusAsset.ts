@@ -3,7 +3,6 @@
 
 import * as OT from "operational-transform";
 import * as mkdirp from "mkdirp";
-import * as async from "async";
 import * as dummy_fs from "fs";
 import * as dummy_path from "path";
 import * as dummy_stylus from "stylus";
@@ -91,37 +90,29 @@ export default class StylusAsset extends SupCore.Data.Base.Asset {
     });
   }
 
-  publish(buildPath: string, callback: (err: Error) => any) {
-    let stylusEntries: SupCore.Data.EntryNode[] = [];
-    this.server.data.entries.walk((node) => {
-      if (node.type === "stylus") stylusEntries.push(node);
-    });
+  serverExport(buildPath: string, assetsById: { [id: string]: StylusAsset }, callback: (err: Error) => void) {
+    let pathFromId = this.server.data.entries.getPathFromId(this.id);
+    if (pathFromId.lastIndexOf(".styl") === pathFromId.length - 5) pathFromId = pathFromId.slice(0, -5);
+    let outputPath = `${buildPath}/assets/${pathFromId}.css`;
+    let parentPath = outputPath.slice(0, outputPath.lastIndexOf("/"));
 
-    let stylusFiles: { [filename: string]: string; } = {};
+    const stylusFiles: { [filename: string]: string; } = {};
+    for (const assetId in assetsById) {
+      if (this.server.data.entries.byId[assetId].type !== "stylus") continue;
 
-    async.each(stylusEntries, (stylusEntry, cb) => {
-      this.server.data.assets.acquire(stylusEntry.id, null, (err: Error, item: StylusAsset) => {
-        let filename = this.server.data.entries.getPathFromId(stylusEntry.id);
-        if (filename.lastIndexOf(".styl") !== filename.length - 5) filename += ".styl";
-        stylusFiles[filename] = item.pub.text;
-        this.server.data.assets.release(stylusEntry.id, null);
-        cb();
-      });
-    }, () => {
-      let pathFromId = this.server.data.entries.getPathFromId(this.id);
-      if (pathFromId.lastIndexOf(".styl") === pathFromId.length - 5) pathFromId = pathFromId.slice(0, -5);
-      let outputPath = `${buildPath}/assets/${pathFromId}.css`;
-      let parentPath = outputPath.slice(0, outputPath.lastIndexOf("/"));
+      let filename = this.server.data.entries.getPathFromId(assetId);
+      if (filename.lastIndexOf(".styl") !== filename.length - 5) filename += ".styl";
+      stylusFiles[filename] = assetsById[assetId].pub.text;
+    }
 
-      let oldReadFileSync = fs.readFileSync;
-      (fs as any).readFileSync = (...args: any[]) => {
-        if (args[0].indexOf(".styl") === -1 || args[0].indexOf("/stylus/lib/") !== -1) { return oldReadFileSync.apply(null, args); }
-        return stylusFiles[args[0].replace(/\\/g, "/")];
-      };
-      let css = stylus(this.pub.text).set("filename", `${pathFromId}.styl`).set("cache", false).render();
-      fs.readFileSync = oldReadFileSync;
-      mkdirp(parentPath, () => { fs.writeFile(outputPath, css, callback); });
-    });
+    let oldReadFileSync = fs.readFileSync;
+    (fs as any).readFileSync = (...args: any[]) => {
+      if (args[0].indexOf(".styl") === -1 || args[0].indexOf("/stylus/lib/") !== -1) { return oldReadFileSync.apply(null, args); }
+      return stylusFiles[args[0].replace(/\\/g, "/")];
+    };
+    let css = stylus(this.pub.text).set("filename", `${pathFromId}.styl`).set("cache", false).render();
+    fs.readFileSync = oldReadFileSync;
+    mkdirp(parentPath, () => { fs.writeFile(outputPath, css, callback); });
   }
 
   server_editText(client: any, operationData: OperationData, revisionIndex: number, callback: EditTextCallback) {

@@ -79,7 +79,7 @@ export default class BlobAsset extends SupCore.Data.Base.Asset {
     });
   }
 
-  publish(buildPath: string, callback: (err: Error) => any) {
+  serverExport(buildPath: string, assetsById: { [id: string]: BlobAsset }, callback: (err: Error) => void) {
     if (this.pub.buffer == null) { callback (null); return; }
 
     let pathFromId = this.server.data.entries.getPathFromId(this.id);
