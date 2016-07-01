@@ -16,22 +16,32 @@ SupCore.system.serverBuild = (server: ProjectServer, buildPath: string, callback
   });
 
   const assetsById: { [id: string]: ExportableAsset } = {};
-  async.each(assetIdsToExport, (assetId, cb) => {
-    server.data.assets.acquire(assetId, null, (err: Error, asset: ExportableAsset) => {
-      server.data.assets.release(assetId, null);
 
-      assetsById[assetId] = asset;
-      cb();
-    });
-  }, (err) => {
-    if (err != null) { callback("Could not load all assets"); return; }
+  async.series([
 
-    async.each(assetIdsToExport, (assetId, cb) => {
-      assetsById[assetId].serverExport(buildPath, assetsById, cb);
-    }, (err) => {
-      if (err != null) { callback("Could not export all assets"); return; }
+    // Acquire all assets
+    (cb) => {
+      async.each(assetIdsToExport, (assetId, cb) => {
+        server.data.assets.acquire(assetId, null, (err: Error, asset: ExportableAsset) => {
+          assetsById[assetId] = asset;
+          cb();
+        });
+      }, cb);
+    },
 
-      callback(null);
-    });
+    // Export all assets
+    (cb) => {
+      async.each(assetIdsToExport, (assetId, cb) => {
+        assetsById[assetId].serverExport(buildPath, assetsById, () => {
+          cb();
+        });
+      }, cb);
+    },
+
+  ], () => {
+    // Release all assets
+    for (const assetId of assetIdsToExport) server.data.assets.release(assetId, null);
+
+    callback(null);
   });
 };
