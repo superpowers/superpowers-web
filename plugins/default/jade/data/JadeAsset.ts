@@ -99,7 +99,7 @@ export default class JadeAsset extends SupCore.Data.Base.Asset {
   serverExport(buildPath: string, assetsById: { [id: string]: JadeAsset }, callback: (err: Error) => void) {
     let pathFromId = this.server.data.entries.getPathFromId(this.id);
     if (pathFromId.lastIndexOf(".jade") === pathFromId.length - 5) pathFromId = pathFromId.slice(0, -5);
-    let outputPath = `${buildPath}/assets/${pathFromId}.html`;
+    let outputPath = `${buildPath}/${pathFromId}.html`;
     let parentPath = outputPath.slice(0, outputPath.lastIndexOf("/"));
 
     const jadeFiles: { [filename: string]: string; } = {};

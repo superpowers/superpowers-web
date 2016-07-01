@@ -88,7 +88,7 @@ export default class BlobAsset extends SupCore.Data.Base.Asset {
       pathFromId += `.${defaultExtensions[this.pub.mediaType]}`;
     }
 
-    let outputPath = `${buildPath}/assets/${pathFromId}`;
+    let outputPath = `${buildPath}/${pathFromId}`;
     let parentPath = outputPath.slice(0, outputPath.lastIndexOf("/"));
     mkdirp(parentPath, () => { fs.writeFile(outputPath, this.pub.buffer, callback); });
   }

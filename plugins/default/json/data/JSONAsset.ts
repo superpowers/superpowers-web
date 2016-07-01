@@ -92,7 +92,7 @@ export default class JSONAsset extends SupCore.Data.Base.Asset {
   serverExport(buildPath: string, assetsById: { [id: string]: JSONAsset }, callback: (err: Error) => void) {
     let pathFromId = this.server.data.entries.getPathFromId(this.id);
     if (pathFromId.lastIndexOf(".json") === pathFromId.length - 5) pathFromId = pathFromId.slice(0, -5);
-    let outputPath = `${buildPath}/assets/${pathFromId}.json`;
+    let outputPath = `${buildPath}/${pathFromId}.json`;
     let parentPath = outputPath.slice(0, outputPath.lastIndexOf("/"));
 
     let text = this.pub.text;
