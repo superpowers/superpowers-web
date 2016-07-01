@@ -1,6 +1,7 @@
 **/node_modules
 
 player/**/*.js
+server/**/*.js
 
 public/index.js
 public/plugins.json
