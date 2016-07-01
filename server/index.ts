@@ -1,6 +1,5 @@
 /// <reference path="./index.d.ts" />
 
-import * as fs from "fs";
 import * as async from "async";
 
 interface ExportableAsset extends SupCore.Data.Base.Asset {
@@ -8,8 +7,6 @@ interface ExportableAsset extends SupCore.Data.Base.Asset {
 }
 
 SupCore.system.serverBuild = (server: ProjectServer, buildPath: string, callback: (err: string) => void) => {
-  fs.mkdirSync(`${buildPath}/assets`);
-
   const assetIdsToExport: string[] = [];
   server.data.entries.walk((entry: SupCore.Data.EntryNode, parent: SupCore.Data.EntryNode) => {
     if (entry.type != null) assetIdsToExport.push(entry.id);
