@@ -94,7 +94,7 @@ export default class StylusAsset extends SupCore.Data.Base.Asset {
     });
   }
 
-  serverExport(buildPath: string, assetsById: { [id: string]: StylusAsset }, callback: (err: Error) => void) {
+  serverExport(buildPath: string, assetsById: { [id: string]: StylusAsset }, callback: (err: Error, writtenFiles: string[]) => void) {
     let pathFromId = this.server.data.entries.getPathFromId(this.id);
     if (pathFromId.lastIndexOf(".styl") === pathFromId.length - 5) pathFromId = pathFromId.slice(0, -5);
     let outputPath = `${buildPath}/${pathFromId}.css`;
@@ -116,7 +116,11 @@ export default class StylusAsset extends SupCore.Data.Base.Asset {
     };
     let css = stylus(this.pub.text).set("filename", `${pathFromId}.styl`).set("cache", false).render();
     fs.readFileSync = oldReadFileSync;
-    mkdirp(parentPath, () => { fs.writeFile(outputPath, css, callback); });
+    mkdirp(parentPath, () => {
+      fs.writeFile(outputPath, css, (err) => {
+        callback(err, [ `${pathFromId}.css` ]);
+      });
+    });
   }
 
   server_editText(client: any, operationData: OperationData, revisionIndex: number, callback: EditTextCallback) {

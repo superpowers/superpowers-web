@@ -96,7 +96,7 @@ export default class JadeAsset extends SupCore.Data.Base.Asset {
     });
   }
 
-  serverExport(buildPath: string, assetsById: { [id: string]: JadeAsset }, callback: (err: Error) => void) {
+  serverExport(buildPath: string, assetsById: { [id: string]: JadeAsset }, callback: (err: Error, writtenFiles: string[]) => void) {
     let pathFromId = this.server.data.entries.getPathFromId(this.id);
     if (pathFromId.lastIndexOf(".jade") === pathFromId.length - 5) pathFromId = pathFromId.slice(0, -5);
     let outputPath = `${buildPath}/${pathFromId}.html`;
@@ -139,7 +139,11 @@ export default class JadeAsset extends SupCore.Data.Base.Asset {
     }
     fs.readFileSync = oldReadFileSync;
 
-    mkdirp(parentPath, () => { fs.writeFile(outputPath, html, callback); });
+    mkdirp(parentPath, () => {
+      fs.writeFile(outputPath, html, (err) => {
+        callback(err, [ `${pathFromId}.html` ]);
+      });
+    });
   }
 
   server_editText(client: any, operationData: OperationData, revisionIndex: number, callback: EditTextCallback) {

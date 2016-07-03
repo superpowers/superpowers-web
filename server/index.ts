@@ -1,25 +1,29 @@
 /// <reference path="./index.d.ts" />
 
 import * as async from "async";
+import * as fs from "fs";
 
-interface ExportableAsset extends SupCore.Data.Base.Asset {
-  serverExport: (outputPath: string, assetsById: { [id: string]: ExportableAsset }, callback: (err: Error) => void) => void;
+interface ServerExportableAsset extends SupCore.Data.Base.Asset {
+  serverExport: (outputPath: string, assetsById: { [id: string]: ServerExportableAsset }, callback: (err: Error, writtenFiles: string[]) => void) => void;
 }
 
 SupCore.system.serverBuild = (server: ProjectServer, buildPath: string, callback: (err: string) => void) => {
   const assetIdsToExport: string[] = [];
+  let files: string[] = [];
   server.data.entries.walk((entry: SupCore.Data.EntryNode, parent: SupCore.Data.EntryNode) => {
-    if (entry.type != null) assetIdsToExport.push(entry.id);
+    if (entry.type == null) return;
+
+    assetIdsToExport.push(entry.id);
   });
 
-  const assetsById: { [id: string]: ExportableAsset } = {};
+  const assetsById: { [id: string]: ServerExportableAsset } = {};
 
   async.series([
 
     // Acquire all assets
     (cb) => {
       async.each(assetIdsToExport, (assetId, cb) => {
-        server.data.assets.acquire(assetId, null, (err: Error, asset: ExportableAsset) => {
+        server.data.assets.acquire(assetId, null, (err: Error, asset: ServerExportableAsset) => {
           assetsById[assetId] = asset;
           cb();
         });
@@ -29,7 +33,8 @@ SupCore.system.serverBuild = (server: ProjectServer, buildPath: string, callback
     // Export all assets
     (cb) => {
       async.each(assetIdsToExport, (assetId, cb) => {
-        assetsById[assetId].serverExport(buildPath, assetsById, () => {
+        assetsById[assetId].serverExport(`${buildPath}/files`, assetsById, (err, writtenFiles) => {
+          files = files.concat(writtenFiles);
           cb();
         });
       }, cb);
@@ -39,6 +44,7 @@ SupCore.system.serverBuild = (server: ProjectServer, buildPath: string, callback
     // Release all assets
     for (const assetId of assetIdsToExport) server.data.assets.release(assetId, null);
 
-    callback(null);
+    // Write files.json
+    fs.writeFile(`${buildPath}/files.json`, JSON.stringify(files), callback);
   });
 };

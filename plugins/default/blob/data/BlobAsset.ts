@@ -79,8 +79,8 @@ export default class BlobAsset extends SupCore.Data.Base.Asset {
     });
   }
 
-  serverExport(buildPath: string, assetsById: { [id: string]: BlobAsset }, callback: (err: Error) => void) {
-    if (this.pub.buffer == null) { callback (null); return; }
+  serverExport(buildPath: string, assetsById: { [id: string]: BlobAsset }, callback: (err: Error, writtenFiles: string[]) => void) {
+    if (this.pub.buffer == null) { callback (null, []); return; }
 
     let pathFromId = this.server.data.entries.getPathFromId(this.id);
     if (pathFromId.lastIndexOf(".") <= pathFromId.lastIndexOf("/")) {
@@ -90,7 +90,11 @@ export default class BlobAsset extends SupCore.Data.Base.Asset {
 
     let outputPath = `${buildPath}/${pathFromId}`;
     let parentPath = outputPath.slice(0, outputPath.lastIndexOf("/"));
-    mkdirp(parentPath, () => { fs.writeFile(outputPath, this.pub.buffer, callback); });
+    mkdirp(parentPath, () => {
+      fs.writeFile(outputPath, this.pub.buffer, (err) => {
+        callback(err, [ pathFromId ]);
+      });
+    });
   }
 
   server_upload(client: any, mediaType: string, buffer: Buffer, callback: UploadCallback) {

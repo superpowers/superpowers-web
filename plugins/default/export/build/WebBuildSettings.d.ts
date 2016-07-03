@@ -1,0 +1,3 @@
+interface WebBuildSettings {
+  outputFolder: string;
+}
