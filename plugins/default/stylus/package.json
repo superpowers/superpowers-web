@@ -13,5 +13,8 @@
   "dependencies": {
     "operational-transform": "^0.2.3",
     "stylus": "^0.52.4"
+  },
+  "devDependencies": {
+    "@types/stylus": "^0.48.27"
   }
 }

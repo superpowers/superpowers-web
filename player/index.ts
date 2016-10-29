@@ -1,5 +1,4 @@
-/// <reference path="../../../../typings/tsd.d.ts" />
-/// <reference path="../../../../SupClient/typings/SupApp.d.ts" />
+/// <reference path="../../../SupClient/typings/SupApp.d.ts" />
 
 import * as querystring from "querystring";
 const qs: { project: string; build: string; } = querystring.parse(window.location.search.slice(1));

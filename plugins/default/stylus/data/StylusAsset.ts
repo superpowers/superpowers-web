@@ -1,5 +1,4 @@
 /// <reference path="../../../common/textEditorWidget/operational-transform.d.ts" />
-/// <reference path="../stylus.d.ts" />
 
 import * as OT from "operational-transform";
 import * as mkdirp from "mkdirp";

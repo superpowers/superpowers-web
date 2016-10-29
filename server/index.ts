@@ -1,4 +1,4 @@
-/// <reference path="./index.d.ts" />
+/// <reference path="../../../SupCore/SupCore.d.ts" />
 
 import * as async from "async";
 import * as fs from "fs";
