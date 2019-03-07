@@ -1,5 +1,5 @@
 /// <reference path="../../../common/textEditorWidget/operational-transform.d.ts" />
-/// <reference path="../api/JadeAPIPlugin.d.ts" />
+/// <reference path="../api/PugAPIPlugin.d.ts" />
 
 import * as OT from "operational-transform";
 import * as mkdirp from "mkdirp";
@@ -13,17 +13,17 @@ let serverRequire = require;
 
 let fs: typeof dummy_fs;
 let path: typeof dummy_path;
-let jade: any;
+let pug: any;
 if ((<any>global).window == null) {
   fs = serverRequire("fs");
   path = serverRequire("path");
-  jade = serverRequire("jade");
+  pug = serverRequire("pug");
 }
 
 type EditTextCallback = SupCore.Data.Base.ErrorCallback & ((err: string, ack: any, operationData: OperationData, revisionIndex: number) => void);
 type ApplyDraftChangedCallback = SupCore.Data.Base.ErrorCallback;
 
-interface JadeAssetPub {
+interface PugAssetPub {
   text: string;
   draft: string;
   revisionId: number;
@@ -33,19 +33,19 @@ interface JadeAssetPub {
 // That's why we keep a reference to our containing system here
 let system = SupCore.system;
 
-export default class JadeAsset extends SupCore.Data.Base.Asset {
+export default class PugAsset extends SupCore.Data.Base.Asset {
   static schema: SupCore.Data.Schema = {
     text: { type: "string" },
     draft: { type: "string" },
     revisionId: { type: "integer" }
   };
 
-  pub: JadeAssetPub;
+  pub: PugAssetPub;
   document: OT.Document;
   hasDraft: boolean;
 
-  constructor(id: string, pub: JadeAssetPub, server: ProjectServer) {
-    super(id, pub, JadeAsset.schema, server);
+  constructor(id: string, pub: PugAssetPub, server: ProjectServer) {
+    super(id, pub, PugAsset.schema, server);
   }
 
   init(options: any, callback: Function) {
@@ -68,9 +68,9 @@ export default class JadeAsset extends SupCore.Data.Base.Asset {
   }
 
   load(assetPath: string) {
-    let pub: JadeAssetPub;
-    fs.readFile(path.join(assetPath, "page.jade"), { encoding: "utf8" }, (err, text) => {
-      fs.readFile(path.join(assetPath, "draft.jade"), { encoding: "utf8" }, (err, draft) => {
+    let pub: PugAssetPub;
+    fs.readFile(path.join(assetPath, "page.pug"), { encoding: "utf8" }, (err, text) => {
+      fs.readFile(path.join(assetPath, "draft.pug"), { encoding: "utf8" }, (err, draft) => {
         pub = { revisionId: 0, text, draft: (draft != null) ? draft : text };
 
         pub.draft = pub.draft.replace(/\r\n/g, "\n");
@@ -82,13 +82,13 @@ export default class JadeAsset extends SupCore.Data.Base.Asset {
   }
 
   save(assetPath: string, callback: (err: Error) => any) {
-    fs.writeFile(path.join(assetPath, "page.jade"), this.pub.text, { encoding: "utf8" }, (err) => {
+    fs.writeFile(path.join(assetPath, "page.pug"), this.pub.text, { encoding: "utf8" }, (err) => {
       if (err != null) { callback(err); return; }
 
       if (this.hasDraft) {
-        fs.writeFile(path.join(assetPath, "draft.jade"), this.pub.draft, { encoding: "utf8" }, callback);
+        fs.writeFile(path.join(assetPath, "draft.pug"), this.pub.draft, { encoding: "utf8" }, callback);
       } else {
-        fs.unlink(path.join(assetPath, "draft.jade"), (err) => {
+        fs.unlink(path.join(assetPath, "draft.pug"), (err) => {
           if (err != null && err.code !== "ENOENT") { callback(err); return; }
           callback(null);
         });
@@ -96,32 +96,33 @@ export default class JadeAsset extends SupCore.Data.Base.Asset {
     });
   }
 
-  serverExport(buildPath: string, assetsById: { [id: string]: JadeAsset }, callback: (err: Error, writtenFiles: string[]) => void) {
+  serverExport(buildPath: string, assetsById: { [id: string]: PugAsset }, callback: (err: Error, writtenFiles: string[]) => void) {
     let pathFromId = this.server.data.entries.getPathFromId(this.id);
-    if (pathFromId.lastIndexOf(".jade") === pathFromId.length - 5) pathFromId = pathFromId.slice(0, -5);
+    const ext = ".pug";
+    if (pathFromId.lastIndexOf(ext) === pathFromId.length - ext.length) pathFromId = pathFromId.slice(0, -ext.length);
     let outputPath = `${buildPath}/${pathFromId}.html`;
     let parentPath = outputPath.slice(0, outputPath.lastIndexOf("/"));
 
-    const jadeFiles: { [filename: string]: string; } = {};
+    const pugFiles: { [filename: string]: string; } = {};
     for (const assetId in assetsById) {
-      if (this.server.data.entries.byId[assetId].type !== "jade") continue;
+      if (this.server.data.entries.byId[assetId].type !== "pug") continue;
 
       let filename = this.server.data.entries.getPathFromId(assetId);
-      if (filename.lastIndexOf(".jade") !== filename.length - 5) filename += ".jade";
-      jadeFiles[filename] = assetsById[assetId].pub.text;
+      if (filename.lastIndexOf(ext) !== filename.length - ext.length) filename += ext;
+      pugFiles[filename] = assetsById[assetId].pub.text;
     }
 
     // NOTE: It might be possible to replace this hack once Jade (well, Pug) 2 is out
     // see https://github.com/pugjs/pug-loader and https://github.com/pugjs/jade/issues/1933
     let oldReadFileSync = fs.readFileSync;
     (fs as any).readFileSync = (...args: any[]) => {
-      if (args[0].indexOf(".jade") === -1) return oldReadFileSync.apply(null, args);
-      return jadeFiles[args[0].replace(/\\/g, "/")];
+      if (args[0].indexOf(".pug") === -1) return oldReadFileSync.apply(null, args);
+      return pugFiles[args[0].replace(/\\/g, "/")];
     };
 
     let options: { [key: string]: any; } = {};
 
-    let plugins = system.getPlugins<SupCore.JadeAPIPlugin>("jadeAPI");
+    let plugins = system.getPlugins<SupCore.PugAPIPlugin>("pugAPI");
     if (plugins != null) {
       for (let pluginName in plugins) {
         let pluginLocals = plugins[pluginName].locals;
@@ -129,11 +130,11 @@ export default class JadeAsset extends SupCore.Data.Base.Asset {
       }
     }
 
-    options["filename"] = `${pathFromId}.jade`;
+    options["filename"] = `${pathFromId}.pug`;
 
     let html = "";
     try {
-      html = jade.render(this.pub.text, options);
+      html = pug.render(this.pub.text, options);
     } catch (err) {
       console.log(err);
     }

@@ -45,6 +45,6 @@ SupCore.system.serverBuild = (server: ProjectServer, buildPath: string, callback
     for (const assetId of assetIdsToExport) server.data.assets.release(assetId, null);
 
     // Write files.json
-    fs.writeFile(`${buildPath}/files.json`, JSON.stringify(files), callback);
+    fs.writeFile(`${buildPath}/files.json`, JSON.stringify(files), (err) => { callback(err != null ? err.message : null); });
   });
 };

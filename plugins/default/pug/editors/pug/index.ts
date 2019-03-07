@@ -1,9 +1,9 @@
-import JadeAsset from "../../data/JadeAsset";
+import PugAsset from "../../data/PugAsset";
 
 let socket: SocketIOClient.Socket;
 let projectClient: SupClient.ProjectClient;
 let editor: TextEditorWidget;
-let asset: JadeAsset;
+let asset: PugAsset;
 
 socket = SupClient.connect(SupClient.query.project);
 socket.on("welcome", onWelcome);
@@ -18,10 +18,10 @@ function onWelcome(clientId: string) {
     onAssetTrashed: SupClient.onAssetTrashed
   };
 
-  projectClient.subAsset(SupClient.query.asset, "jade", subscriber);
+  projectClient.subAsset(SupClient.query.asset, "pug", subscriber);
 }
 
-function onAssetReceived(assetId: string, theAsset: JadeAsset) {
+function onAssetReceived(assetId: string, theAsset: PugAsset) {
   asset = theAsset;
   editor.setText(asset.pub.draft);
 }
@@ -38,7 +38,7 @@ function onAssetEdited(assetId: string, command: string, ...args: any[]) {
 function setupEditor(clientId: string) {
   let textArea = <HTMLTextAreaElement>document.querySelector(".text-editor");
   editor = new TextEditorWidget(projectClient, clientId, textArea, {
-    mode: "text/x-jade",
+    mode: "text/x-pug",
     extraKeys: {
       "Ctrl-S": () => { applyDraftChanges(); },
       "Cmd-S": () => { applyDraftChanges(); },

@@ -1,7 +1,7 @@
 /// <reference path="../../../SupClient/typings/SupApp.d.ts" />
 
 import * as querystring from "querystring";
-const qs: { project: string; build: string; } = querystring.parse(window.location.search.slice(1));
+const qs: { project: string; build: string; } = querystring.parse(window.location.search.slice(1)) as any;
 
 const indexPath = `/builds/${qs.project}/${qs.build}/files/index.html`;
 

@@ -1,5 +1,5 @@
 declare namespace SupCore {
-  export interface JadeAPIPlugin {
+  export interface PugAPIPlugin {
     locals: { [name: string]: any };
   }
 }

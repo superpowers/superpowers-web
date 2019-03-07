@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "operational-transform": "^0.2.3",
-    "stylus": "^0.52.4"
+    "stylus": "^0.54.5"
   },
   "devDependencies": {
-    "@types/stylus": "^0.48.27"
+    "@types/stylus": "^0.48.31"
   }
 }

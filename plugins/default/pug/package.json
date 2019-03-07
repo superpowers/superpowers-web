@@ -1,6 +1,6 @@
 {
-  "name": "superpowers-web-default-jade-plugin",
-  "description": "Jade plugin for Superpowers Web, the collaborative static site editor",
+  "name": "superpowers-web-default-pug-plugin",
+  "description": "Pug plugin for Superpowers Web, the collaborative static site editor",
   "version": "1.0.0",
   "license": "ISC",
   "repository": {
@@ -11,7 +11,7 @@
     "build": "gulp --gulpfile=../../../../../scripts/pluginGulpfile.js --cwd=."
   },
   "dependencies": {
-    "jade": "^1.11.0",
-    "operational-transform": "^0.2.3"
+    "operational-transform": "^0.2.3",
+    "pug": "^2.0.3"
   }
 }
